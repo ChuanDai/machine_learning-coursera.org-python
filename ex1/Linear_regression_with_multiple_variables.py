@@ -55,7 +55,7 @@ def feature_normalize(x):
         if sigma[i] != 0:
             for j in range(num_examples):
                 # to implement feature scaling and mean normalization
-                # by x_normalize = (x-mu)/sigma
+                # by x_normalize = (x - mu) / sigma
                 x_normalize[j, i] = (x[j, i] - mu[i]) / sigma[i]
 
     return x_normalize, mu, sigma
@@ -75,7 +75,7 @@ def plot_convergence_graph(x):
 
 if __name__ == "__main__":
     # load data set
-    # for one variables
+    # for one variable
     # x = np.loadtxt('ex1data1.txt', delimiter=',', usecols=0)
     # y = np.loadtxt('ex1data1.txt', delimiter=',', usecols=1)
 
@@ -89,15 +89,22 @@ if __name__ == "__main__":
     # max value of iterations
     max_iterations = 400
 
-    # for Feature Scaling and Mean Normalization
-    # not applicable to one variables linear regression
-    normalized = feature_normalize(x)
-    x = normalized[0]
-    mu = normalized[1]
-    sigma = normalized[2]
-
     # extract number of examples and features
-    num_examples, num_features = np.shape(x)
+    if len(x.shape) == 1:
+        num_examples = np.shape(x)[0]
+        num_features = 1
+    else:
+        num_examples, num_features = np.shape(x)
+
+        # for Feature Scaling and Mean Normalization
+        # not applicable to one variables linear regression
+        # normalized = feature_normalize(x)
+        normalized = feature_normalize(x)
+        x = normalized[0]
+        # save mu and sigma for tracking the status of
+        # Feature Scaling and Mean Normalization later
+        mu = normalized[1]
+        sigma = normalized[2]
 
     # concatenate an all ones vector as the first column
     x = np.hstack((np.ones((len(y), 1)), x.reshape(num_examples, num_features)))
@@ -110,8 +117,8 @@ if __name__ == "__main__":
     thetas = gradient_descent[0]
     j_history = gradient_descent[1]
 
-    print('cost', cost)
-    print('thetas', thetas)
+    print('cost: ', cost)
+    print('thetas: ', thetas)
 
     # plot convergence graph
     plot_convergence_graph(j_history)
