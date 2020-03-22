@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import statistics
 
 
-def compute_cost(x, y, thetas):
+def cost_function(thetas, x, y):
     num_examples = np.shape(x)[0]
 
     # calculate the difference between
@@ -26,13 +26,13 @@ def gradient_descent(x, y, thetas, alpha, max_iterations):
         thetas_previous = thetas
 
         for j in range(num_features):
-            # calculate dJ/d(theta_j)
+            # calculate dj/d(theta(j)) = (h(x) - y) * x(j) / m, (h(x) = x * thetas)
             derivative = ((np.dot(x, thetas_previous) - y).transpose()) * x[:, j] / num_examples
-            # update theta_j
+            # simultaneously update theta(j)
             thetas[j] = thetas_previous[j] - alpha * derivative.sum()
 
-        # save the historic values of cost function
-        j_history[i] = compute_cost(x, y, thetas)
+        # save the values of j of each iteration
+        j_history[i] = cost_function(x, y, thetas)
 
     return thetas, j_history
 
@@ -83,10 +83,9 @@ if __name__ == "__main__":
     x = np.loadtxt('ex1data2.txt', delimiter=',', usecols=(0, 1))
     y = np.loadtxt('ex1data2.txt', delimiter=',', usecols=2)
 
-    # alpha is the learning rate or size of step
-    # to take in the gradient decent
+    # learning rate and the maximum iteration
+    # should be tuned based on varying data set
     alpha = 0.01
-    # max value of iterations
     max_iterations = 400
 
     # extract number of examples and features
@@ -98,7 +97,6 @@ if __name__ == "__main__":
 
         # for Feature Scaling and Mean Normalization
         # not applicable to one variables linear regression
-        # normalized = feature_normalize(x)
         normalized = feature_normalize(x)
         x = normalized[0]
         # save mu and sigma for tracking the status of
@@ -112,13 +110,12 @@ if __name__ == "__main__":
     # initialize thetas
     thetas = np.zeros(num_features + 1)
 
-    cost = compute_cost(x, y, thetas)
-    gradient_descent = gradient_descent(x, y, thetas, alpha, max_iterations)
-    thetas = gradient_descent[0]
-    j_history = gradient_descent[1]
+    # calculate cost by cost function
+    print('Cost at thetas:\n', cost_function(x, y, thetas))
 
-    print('cost: ', cost)
-    print('thetas: ', thetas)
+    # calculate thetas by gradient descent
+    thetas, j_history = gradient_descent(x, y, thetas, alpha, max_iterations)
+    print('Thetas found by gradient descent:\n', thetas)
 
     # plot convergence graph
     plot_convergence_graph(j_history)
