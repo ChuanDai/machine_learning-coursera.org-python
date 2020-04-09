@@ -15,11 +15,11 @@ def cost_function(thetas, x, y):
 
     y_transpose = y.transpose()
     # j1 = -y * log(h(x)), (for y = 1)
-    y_equals_1 = np.dot(-y_transpose, np.log(hypothesis))
+    j1 = np.dot(-y_transpose, np.log(hypothesis))
     # j0 = -(1 - y) * log(1 - h(x)), (for y = 0)
-    y_equals_0 = np.dot((1 - y_transpose), np.log(1 - hypothesis))
-    # j = (j1 + j0) / m
-    j = (y_equals_1 - y_equals_0) / num_examples
+    j0 = np.dot(-(1 - y_transpose), np.log(1 - hypothesis))
+    # j = (j1 + j0) / num_examples
+    j = (j1 + j0) / num_examples
 
     return j
 
@@ -39,8 +39,10 @@ def gradient(thetas, x, y):
 
     z = np.dot(x, thetas)
     hypothesis = sigmoid(z)
-    # gradient = dj/d(theta(j)) = (h(x) - y) * x(j) / m
-    gradient = np.dot(x.transpose(), (hypothesis - y)) / num_examples
+    # gradient = dj/d(theta(j)) = (h(x) - y) * x(j) / num_examples
+    # an alternative would be:
+    # gradient = np.dot(x.transpose(), (hypothesis - y)) / num_examples
+    gradient = np.dot((hypothesis.T - y), x) / num_examples
 
     return gradient
 
@@ -168,28 +170,28 @@ if __name__ == "__main__":
     # data set needs regularization
     x = np.loadtxt('ex2data2.txt', delimiter=',', usecols=(0, 1))
     y = np.loadtxt('ex2data2.txt', delimiter=',', usecols=2)
-
-    # return a new feature array with more features
+    
+    # return a new feature array with more features    
     x = map_feature(x[:, 0], x[:, 1])
-
+    
     # extract the number of examples
     num_features = np.shape(x)[1]
-
+    
     # initialize thetas
-    # an alternative would be thetas = np.ones(num_features)
+    # an alternative would be
+    # thetas = np.ones(num_features)
     thetas = np.zeros(num_features)
-    thetas = np.ones(num_features)
 
     # set a regularized parameter
     # an alternative value would be 10
-    lambda_value = 10
-
+    lambda_value = 1
+    
     print('Cost at thetas (with lambda = {}):\n'.format(lambda_value), cost_function_regularized(thetas, x, y, lambda_value))
     print('Gradient at thetas (with lambda = {}):\n'.format(lambda_value), gradient_regularized(thetas, x, y, lambda_value))
     '''
 
     # the regularized gradient can be also verified by plotting a convergence graph
-    # a similar gradient_descent function can be applied for this propose
+    # a similar gradient_descent function can be applied for this purpose
 
     # for plot the decision boundary refer to:
     # https://github.com/arturomp/coursera-machine-learning-in-python/blob/master/mlclass-ex2-004/mlclass-ex2/plotDecisionBoundary.py
